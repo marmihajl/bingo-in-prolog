@@ -1,0 +1,125 @@
+:-[random].		  %modul za generiranje nasumičnih vrijendosti
+:-[array].%modul za rad s poljem(inicijalizacija, dodavanje/mijenjanje elemenata polja i uspoređivanje elemenata polja)
+
+%u izborniku su ponuđene mogućnosti igre, prema odabiru mogućnosti iz izbornika pokreće se odabrana funkcionalnost igre
+izbornik :- writeln('Dobar dan!'),
+	writeln('a.Nova igra'),
+	writeln('b.Pomoc'),
+	writeln('c.Izlaz'),
+	read(Izbor),
+	(Izbor == 'a', igra
+	;Izbor=='b', writeln('Odaberite 10 brojeva izmedu 1 i 30. Brojevi se mogu ponavljati. Cilj igre je pogoditi veći broj brojeva od racunala.'),izbornik
+	;Izbor == 'c', writeln('Dovidenja')).
+:-izbornik.
+
+				%funkcija za generiranje brojeva između 1 i 30, koristi se za generiranje izvucenih brojeva i brojeva računala
+generiraj(X):-
+	random(1,30,X).
+
+%funkcija za unos brojeva igrača
+myNumber(X):-
+	array_new(X,10),%funkcija iz modula array, inicijalizira polje pod nazivom X koje ima 10 elemenata
+	writeln('Odaberite 10 brojeva(1-30)'),%ispis poruke
+	write('1.broj: '), read(Broj),%u term Broj se sprema vrijednost koju igrač unese preko tipkovnice
+	array_update(X,1,Broj),%u funkciji array_update(X,Y,Z) vrijednost Z se sprema u polje X na mjesto Y 
+	write('2.broj: '), read(Broj2),
+	number(Broj2),
+	array_update(X,2,Broj2),
+	write('3.broj: '), read(Broj3), 
+	array_update(X,3,Broj3),
+	write('4.broj: '), read(Broj4), 
+	array_update(X,4,Broj4),
+	write('5.broj: '), read(Broj5), 
+	array_update(X,5,Broj5),
+	write('6.broj: '), read(Broj6), 
+	array_update(X,6,Broj6),
+	write('7.broj: '), read(Broj7), 
+	array_update(X,7,Broj7),
+	write('8.broj: '), read(Broj8), 
+	array_update(X,8,Broj8),
+	write('9.broj: '), read(Broj9), 
+	array_update(X,9,Broj9),
+	write('10.broj: '), read(Broj10), 
+	array_update(X,10,Broj10),
+	write('Vasi brojevi su: ').%priprema za ispis unesenih brojeva od strane igrača
+
+%funkcija za generiranje brojeva računala i izvucenih brojeva(generira se 10 nasumičnih brojeva koristeći funkciju generiraj)
+compNumber(X):-
+	array_new(X,10),
+	generiraj(Broj),
+	array_update(X,1,Broj),
+	generiraj(Broj2),
+	array_update(X,2,Broj2),
+	generiraj(Broj3),
+	array_update(X,3,Broj3),
+	generiraj(Broj4),
+	array_update(X,4,Broj4),
+	generiraj(Broj5),
+	array_update(X,5,Broj5),
+	generiraj(Broj6),
+	array_update(X,6,Broj6),
+	generiraj(Broj7),
+	array_update(X,7,Broj7),
+	generiraj(Broj8),
+	array_update(X,8,Broj8),
+	generiraj(Broj9),
+	array_update(X,9,Broj9),
+	generiraj(Broj10),
+	array_update(X,10,Broj10).
+
+%funkcija koja sadrži raspored i pozive ostalih funkcija za pravilno izvođenje igre
+igra:-	
+	myNumber(X),	%poziv unosa brojeva od strane igrača
+	writeln(X),%ispis unesenih brojeva
+	compNumber(Y),%generiranje brojeva računala
+	write('brojevi racunala: '),
+	writeln(Y),
+	compNumber(Z),%generiranje izvučenih brojeva
+	write('izvuceni brojevi: '),
+	writeln(Z),
+	brojPogodaka(X,Z,M),%određivanje koliko je igrač pogodio brojeva(sprema se u term M)
+	write('Broj mojih pogodaka: '),writeln(M),
+	brojPogodaka(Y,Z,N),%određivanje koliko je računalo pogodilo brojeva(sprema se i term N)
+	write('Broj pogodaka racunala: '),writeln(N),
+	%određuje se tko je pobijedio i prema tome se ispisuje poruka
+	(M>N,writeln('Pobjeda'),izbornik
+	;M<N,writeln('Poraz'),izbornik
+	;M==N,writeln('Nerjeseno'),igra).%ako igrač i računalo imaju jednak broj pogodaka igra se ponavlja
+
+%funkcija za provjeru da li u polju X je sadržana vrijednost Y
+provjeri(X,Y):-
+	array_elt(X,1,Y)
+	;array_elt(X,2,Y)
+	;array_elt(X,3,Y)
+	;array_elt(X,4,Y)
+	;array_elt(X,5,Y)
+	;array_elt(X,6,Y)
+	;array_elt(X,7,Y)
+	;array_elt(X,8,Y)
+	;array_elt(X,9,Y)
+	;array_elt(X,10,Y).
+
+%funkcija za provjeruj koliko je pogođenih brojeva, X je polje odabranih brojeva,Z je polje izvučenih brojeva, a P9 je ukupan broj pogođenih brojeva
+brojPogodaka(X,Z,P9):-
+	array_elt(Z,1,I1),%array_elt vraća istinu se u Z na mjestu nalazi I1, odnosno u ovom slučaju se u I1 sprema vrijednos koja se nalazi na mjestu 1
+	(provjeri(X,I1)->P is 1;P is 0),%uspoređuje se da li se u polju odabranih brojeva nalazi 1. iz polja izvučenih brojeva
+	array_elt(Z,2,I2),
+	(provjeri(X,I2)->P1 is P +1; P1 is P),
+	array_elt(Z,3,I3),
+	(provjeri(X,I3)->P2 is P1 + 1; P2 is P1),
+	array_elt(Z,4,I4),
+	(provjeri(X,I4)->P3 is P2 + 1; P3 is P2),
+	array_elt(Z,5,I5),
+	(provjeri(X,I5)->P4 is P3 + 1; P4 is P3),
+	array_elt(Z,6,I6),
+	(provjeri(X,I6)->P5 is P4 + 1; P5 is P4),
+	array_elt(Z,7,I7),
+	(provjeri(X,I7)->P6 is P5 + 1; P6 is P5),
+	array_elt(Z,8,I8),
+	(provjeri(X,I8)->P7 is P6 + 1; P7 is P6),
+	array_elt(Z,9,I9),
+	(provjeri(X,I9)->P8 is P7 + 1; P8 is P7),
+	array_elt(Z,10,I10),
+	(provjeri(X,I10)->P9 is P8 + 1; P9 is P8).
+
+
